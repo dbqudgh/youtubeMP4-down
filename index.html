@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel='stylesheet' type ='text/css' media='screen' href='main.css'>
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <title>youtubeDown</title>
+  </head>
+  <body>
+    <div class="login">
+      <h1>youtube</h1>
+        <form method="post">
+          <input type="text" name="u" class="url" placeholder="주소" required="required" />
+          <input type="text" class="title" placeholder="제목" required="required"/>
+            <input type="text" name="p" class="path" placeholder="폴더경로" required="required" />
+            
+        </br>
+        <div class="box">
+            <select class="format">
+              <option value="--format=137">1080p</option>
+              <option value="--format=136">720p</option>
+              <option value="--format=135">480p</option>
+              <option value="--format=134">360p</option>
+              <option value="--format=133">240p</option>
+              <option value="--format=160">144p</option>
+            </select>
+          </div>
+
+      </br>
+
+            <button type="submit" class="btn btn-primary btn-block btn-large">down</button>
+        </form>
+      </div>
+      <div class="status">
+        
+      </div>
+    <!-- You can also require other files to run in this process -->
+    <script src="./renderer.js"></script>
+  </body>
+</html>

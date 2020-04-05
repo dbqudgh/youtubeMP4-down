@@ -10,6 +10,7 @@ const button = document.querySelector('.btn');
 const status = document.querySelector('.status');
 const title = document.querySelector('.title');
 const select = document.querySelector('.format');
+const parsent = document.querySelector('.persent');
 
 //local
 const  PATH_LS = 'toPath';
@@ -19,25 +20,28 @@ const loadedToPath = localStorage.getItem(PATH_LS);
 const loadedToUrl = localStorage.getItem(URL_LS);
 
 
-window.addEventListener('error',()=>{
+//변수
+let downloaded = 0;
+let infoSize = 0;
+
+let ITV = '';
+
+// window.addEventListener('error',()=>{
     
-    status = '';
+//     status = '';
 
-    alert('error');
+//     alert('error');
 
-    window.location.reload();
+//     window.location.reload();
 
 
-})
+// })
 
 
 document.addEventListener('DOMContentLoaded',()=>{
     
     if(loadedToPath !== null){
         path.value = JSON.parse(loadedToPath);
-    }
-    if(loadedToUrl !== null){
-        url.value = JSON.parse(loadedToUrl)
     }
 
 })
@@ -51,9 +55,9 @@ function download(url,path,title,format){
         if (err){
             alert('잘못된링크입니다.');
             status.textContent = '';
+            url.value = '';
             return;
         }
-        console.log(format.textContent);
       })
 
 
@@ -61,24 +65,52 @@ function download(url,path,title,format){
     // Optional arguments passed to youtube-dl.
     [format.value],
     // Additional options can be given for calling `child_process.execFile()`.
-    { cwd: __dirname })
- 
+    { cwd: __dirname }
+    )
+
+    
+    
     // Will be called when the download starts.
     video.on('info', function(info) {
-        status.innerHTML = `다운로드중입니다. 프로그램을 종료하지마세요! </br>${info._filename}`
+        
+        status.innerHTML = `다운로드중입니다. 프로그램을 종료하지마세요! </br>${info._filename}</br>`
+        infoSize = info.size
+        
+        if (fs.existsSync(path+'/'+title+'.mp4')) {
+
+            ITV = setInterval(()=>{
+                
+                downloaded = fs.statSync(path+'/'+title+'.mp4').size
+                parsent.innerHTML = ((downloaded/infoSize)*100).toFixed(1)+'% 다운로드중'
+                
+            },500)
+        }
     })
+    
     video.on('end',()=>{
+        
         status.innerHTML = `다운로드 완료되었습니다!`
+        parsent.innerHTML = '';
+
+        document.querySelector('.url').value ='';
+        document.querySelector('.title').value = '';
+        downloaded = 0;
+        infoSize = 0;
+
+        clearInterval(ITV);
+        
     })
+    
 
-    video.pipe(fs.createWriteStream(path+'/'+title))
-
+    video.pipe(fs.createWriteStream(path+'/'+title+'.mp4'))
+    
+    
 }
 
-    path.addEventListener('change',(e)=>{
-
-        localStorage.removeItem(PATH_LS);
-        localStorage.setItem( PATH_LS, JSON.stringify(path.value));
+path.addEventListener('change',(e)=>{
+    
+    localStorage.removeItem(PATH_LS);
+    localStorage.setItem( PATH_LS, JSON.stringify(path.value));
     
     })
 
@@ -91,13 +123,13 @@ function download(url,path,title,format){
     
         e.preventDefault();
         
-       if(url.value !== '' && path.value !== '' && title.value !== '' && select.options[select.selectedIndex].value === ''){
+       if(url.value !== '' && path.value !== '' && title.value !== '' && select.options[select.selectedIndex].value !== ''){
         fs.stat(path.value, function(err) {
             if (!err) {
 
                     status.textContent = '..다운로드중..'
                    
-                    download(url.value,path.value,title.value+'.mp4',select.options[select.selectedIndex])
+                    download(url.value,path.value,title.value,select.options[select.selectedIndex])
                 
                 
             }
